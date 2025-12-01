@@ -33,7 +33,7 @@
 
             const peek = () => stack[stack.length - 1];
             const addToOutput = (token: string) => {
-                output += output + token;
+                output += ' ' + token;
             };
             const handlePop = () => stack.pop();
 
