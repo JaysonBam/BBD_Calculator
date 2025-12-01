@@ -9,42 +9,39 @@
 </head>
 <body>
     <main class="container">
-        <section class="calculator">
-            <section>
-                <input type="text" readonly>
+        <article class="calculator">
+            <section class="display-area">
+                <input type="text" readonly aria-label="Calculator Display">
             </section>
-            <section>
-                <button>CL</button>
-                <button>DL</button>
-                <button>(</button>
-                <button>)</button>
-                <button>^</button>
+            <section class="function-keys">
+                <button class="action">CL</button>
+                <button class="action">DL</button>
+                <button class="operator">(</button>
+                <button class="operator">)</button>
+                <button class="operator">^</button>
             </section>
-            <section>
+            <section class="number-pad">
                 <button>1</button>
                 <button>2</button>
                 <button>3</button>
-                <button>/</button>
-            </section>
-            <section>
+                <button class="operator">/</button>
+                
                 <button>4</button>
                 <button>5</button>
                 <button>6</button> 
-                <button>*</button>
-            </section>
-            <section>
+                <button class="operator">*</button>
+                
                 <button>7</button>
                 <button>8</button>
                 <button>9</button> 
-                <button>-</button>
-            </section>
-            <section>
+                <button class="operator">-</button>
+                
                 <button>0</button>
                 <button>.</button>
-                <button>=</button> 
-                <button>+</button>
+                <button class="equals">=</button> 
+                <button class="operator">+</button>
             </section>
-        </section>
+        </article>
     </main>
 </body>
 </html>

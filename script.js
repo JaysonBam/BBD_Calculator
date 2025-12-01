@@ -162,6 +162,7 @@
             else if (input === CalculateValue) {
                 display.value = calculate(display.value);
             }
+            display.scrollLeft = display.scrollWidth;
         }
         calculator.addEventListener('click', (e) => {
             var _a;
