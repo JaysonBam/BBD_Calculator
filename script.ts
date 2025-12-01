@@ -142,7 +142,7 @@
 
         //Handels input from mulltple sources
         function handleInput(input: string){
-            if (display.value === 'Error'){
+            if (display.value === 'Error' || display.value === 'NaN' ){
                 display.value = ''
             }
 
