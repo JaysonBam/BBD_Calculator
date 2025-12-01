@@ -5,9 +5,139 @@
         if (!displayElement) {return}
         const display = displayElement;
 
+        class Node {
+            value: string;
+            left: Node | null;
+            right: Node | null;
+
+            constructor(value: string) {
+                this.value = value;
+                this.left = null;
+                this.right = null;
+            }
+        }
+
+        const operators: { [key: string]: { prec: number, assoc: 'left' | 'right' } } = {
+            '^': { prec: 4, assoc: 'right' },
+            '*': { prec: 3, assoc: 'left' },
+            '/': { prec: 3, assoc: 'left' },
+            '+': { prec: 2, assoc: 'left' },
+            '-': { prec: 2, assoc: 'left' },
+        };
+
+        // Source: https://inspirnathan.com/posts/151-shunting-yard-algorithm-in-javascript
+        function ShuntingYard(infix: string): string{
+            const opSymbols = Object.keys(operators);
+            const stack: string[] = [];
+            let output = '';
+
+            const peek = () => stack[stack.length - 1];
+            const addToOutput = (token: string) => {
+                output += (output ? ' ' : '') + token;
+            };
+            const handlePop = () => stack.pop();
+
+            const tokens = infix.match(/(\d+(\.\d+)?)|[+\-*/^()]|(\.\d+)/g);
+            if (!tokens) return '';
+
+            for (const token of tokens) {
+                if (!isNaN(parseFloat(token))) {
+                    addToOutput(token);
+                } else if (opSymbols.includes(token)) {
+                    const o1 = token;
+                    let o2 = peek();
+
+                    while (
+                        o2 !== undefined &&
+                        o2 !== '(' &&
+                        (operators[o2].prec > operators[o1].prec ||
+                            (operators[o2].prec === operators[o1].prec &&
+                                operators[o1].assoc === 'left'))
+                    ) {
+                        addToOutput(handlePop()!);
+                        o2 = peek();
+                    }
+                    stack.push(o1);
+                } else if (token === '(') {
+                    stack.push(token);
+                } else if (token === ')') {
+                    let topOfStack = peek();
+                    while (topOfStack !== '(') {
+                        if (stack.length === 0) throw new Error('Mismatched parentheses');
+                        addToOutput(handlePop()!);
+                        topOfStack = peek();
+                    }
+                    handlePop();
+                }
+            }
+
+            while (stack.length !== 0) {
+                const top = peek();
+                if (top === '(') throw new Error('Mismatched parentheses');
+                addToOutput(stack.pop()!);
+            }
+
+            return output;
+        }
+
+        // Source: https://www.geeksforgeeks.org/dsa/expression-tree/
+        function buildExpressionTree(postfix: string): Node{
+            const stack: Node[] = [];
+            const tokens = postfix.split(' ');
+
+            for (const token of tokens) {
+                if (operators[token]) {
+                    const z = new Node(token);
+                    const x = stack.pop();
+                    const y = stack.pop();
+                    
+                    if (!x || !y) throw new Error('Invalid expression');
+
+                    z.left = y;
+                    z.right = x;
+                    stack.push(z);
+                } else {
+                    stack.push(new Node(token));
+                }
+            }
+            
+            return stack.pop()!;
+        }
+
+        // Source: https://www.geeksforgeeks.org/dsa/evaluation-of-expression-tree/
+        function evaluateTree(tree: Node): string{
+            if (!tree) return '0';
+
+            if (!tree.left && !tree.right) {
+                return tree.value;
+            }
+
+            const leftEval = parseFloat(evaluateTree(tree.left!));
+            const rightEval = parseFloat(evaluateTree(tree.right!));
+
+            switch (tree.value) {
+                case '+': return (leftEval + rightEval).toString();
+                case '-': return (leftEval - rightEval).toString();
+                case '*': return (leftEval * rightEval).toString();
+                case '/': 
+                    if (rightEval === 0) throw new Error('Division by zero');
+                    return (leftEval / rightEval).toString();
+                case '^': return Math.pow(leftEval, rightEval).toString();
+                default: return '0';
+            }
+        }
+
         //Calculates value of the string
-        function calculate(expression: string): string{
-            return "67"
+        function calculate(infix: string): string{
+            try {
+                const postfix = ShuntingYard(infix);
+                if (!postfix) return '';
+                const tree = buildExpressionTree(postfix);
+                return evaluateTree(tree);
+            } catch (e) {
+                console.error(e);
+                return 'Error';
+            }
         }
 
         //Handels input from mulltple sources
@@ -20,8 +150,6 @@
             const repeatValues: string[] = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '.'] 
             //inputs that can not be repeated
             const nonRepeatValues: string[] = ['/', '*', '+', '-', '^'];
-            //inputs with that need brakets
-            const functionValues: string[] = ['sin', 'cos', 'tan', 'log'];
             //clear input
             const ClearValue: string = 'CL'
             //delete input
@@ -37,9 +165,6 @@
                 if (nonRepeatValues.includes(display.value.slice(-1)))
                     display.value = display.value.slice(0,-1)
                 display.value += input;
-            }
-            else if (functionValues.includes(input)) {
-                display.value += input + '(';
             }
             else if (input === ClearValue){
                 display.value = '';
@@ -67,14 +192,6 @@
             } else if (e.key === 'Delete') {
                 e.preventDefault();
                 handleInput('CL');
-            } else if (e.key === 's') {
-                handleInput('sin');
-            } else if (e.key === 'c') {
-                handleInput('cos');
-            } else if (e.key === 't') {
-                handleInput('tan');
-            } else if (e.key === 'l') {
-                handleInput('log');
             } else {
                 const validKeys = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '(', ')', '.', '/', '*', '+', '-', '^'];
                 if (validKeys.includes(e.key)) {
