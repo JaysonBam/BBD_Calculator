@@ -40,7 +40,21 @@
             const tokens = infix.match(/(\d+(\.\d+)?)|[+\-*/^()]|(\.\d+)/g);
             if (!tokens) return '';
 
-            for (const token of tokens) {
+            const processedTokens: string[] = [];
+            for (let i = 0; i < tokens.length; i++) {
+                const token = tokens[i];
+                if (token === '-') {
+                    const isUnary = i === 0 || ['+', '-', '*', '/', '^', '('].includes(tokens[i - 1]);
+                    if (isUnary && i + 1 < tokens.length && !isNaN(parseFloat(tokens[i + 1]))) {
+                        processedTokens.push('-' + tokens[i + 1]);
+                        i++;
+                        continue;
+                    }
+                }
+                processedTokens.push(token);
+            }
+
+            for (const token of processedTokens) {
                 if (!isNaN(parseFloat(token))) {
                     addToOutput(token);
                 } else if (opSymbols.includes(token)) {
