@@ -131,7 +131,7 @@
         }
         //Handels input from mulltple sources
         function handleInput(input) {
-            if (display.value === 'Error') {
+            if (display.value === 'Error' || display.value === 'NaN') {
                 display.value = '';
             }
             //inputs that can be repeated
