@@ -28,7 +28,7 @@
             let output = '';
             const peek = () => stack[stack.length - 1];
             const addToOutput = (token) => {
-                output += (output ? ' ' : '') + token;
+                output += output + token;
             };
             const handlePop = () => stack.pop();
             const tokens = infix.match(/(\d+(\.\d+)?)|[+\-*/^()]|(\.\d+)/g);
